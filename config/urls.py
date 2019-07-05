@@ -8,7 +8,11 @@ urlpatterns = [
 
     path("users/", include("zhihu.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
-    # Your stuff: custom urls includes go here
+
+    path('news/', include('news.urls', namespace="news")),
+
+
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
