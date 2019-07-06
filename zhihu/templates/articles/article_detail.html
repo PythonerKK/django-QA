@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static comments crispy_forms_tags thumbnail %}
+{% load static crispy_forms_tags comments thumbnail %}
 
 {% block title %}{{ article.title|title }} - {{ block.super }}{% endblock %}
 
@@ -34,21 +34,7 @@
                 <!-- Post Content -->
                 <p class="card-text">{{ article.get_markdown|safe }}</p>
                 <hr>
-                <!-- Comments Form -->
-                <div class="card my-4">
-                    <h5 class="card-header">评论</h5>
-                    <div class="card-body">
-                        {% if user.is_authenticated %}
-                            {% get_comment_form for article as form %}
-                            <form action="{% comment_form_target %}" method="POST">
-                                {% csrf_token %}
-                                {{ form|crispy }}
-                                <input type="hidden" name="next" value="{% url 'articles:article' article.slug %}"/>
-                                <input class="btn btn-info" type="submit" value="提交" id="id_submit"/>
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
+
 
                 <!-- Single Comment -->
                 {% get_comment_list for article as comment_list %}
@@ -65,6 +51,24 @@
                         </div>
                     </div>
                 {% endfor %}
+
+
+                              <!-- Comments Form -->
+                <div class="card my-4">
+                    <h5 class="card-header">评论</h5>
+                    <div class="card-body">
+                        {% if user.is_authenticated %}
+                            {% get_comment_form for article as form %}
+                            <form action="{% comment_form_target %}" method="POST">
+                                {% csrf_token %}
+                                {{ form|crispy }}
+                                <input type="hidden" name="next" value="{% url 'articles:article' article.slug %}"/>
+                                <input class="btn btn-info" type="submit" value="提交" id="id_submit"/>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+
             </div>
 
             <!-- Sidebar Widgets Column -->
@@ -77,7 +81,7 @@
                                 <i class="fa fa-pencil" aria-hidden="true"></i> 写文章</a>
 
                             {% if request.user.username == article.user.username %}
-                                <a class="btn btn-primary" href="{% url 'articles:edit_article' article.id %}" title="编辑文章">
+                                <a class="btn btn-primary" href="{% url 'articles:edit_article' article.pk %}" title="编辑文章">
                                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> 编辑</a>
                             {% endif %}
 

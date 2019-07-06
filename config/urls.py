@@ -9,8 +9,11 @@ urlpatterns = [
     path("users/", include("zhihu.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
 
-    path('news/', include('news.urls', namespace="news")),
+    path('markdownx/', include('markdownx.urls')),
+    path('comments/', include('django_comments.urls')),
 
+    path('news/', include('news.urls', namespace="news")),
+    path('articles/', include('articles.urls', namespace='articles'))
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

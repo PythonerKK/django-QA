@@ -65,7 +65,8 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.humanize", # Handy template tags
+    "django.contrib.humanize", # Handy template tags,
+    'django.forms'
 ]
 THIRD_PARTY_APPS = [
     "crispy_forms",
@@ -74,15 +75,22 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     'allauth.socialaccount.providers.github',
     "django_celery_beat",
-    'sorl.thumbnail'
+    'sorl.thumbnail',
+    'taggit',
+    'markdownx',
+    'django_comments',
 ]
 
 LOCAL_APPS = [
     "zhihu.users.apps.UsersConfig",
-    'zhihu.news.apps.NewsConfig'
+    'zhihu.news.apps.NewsConfig',
+    'zhihu.articles.apps.ArticlesConfig',
+    'zhihu.qa.apps.QaConfig',
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
