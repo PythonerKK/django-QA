@@ -35,40 +35,20 @@ $(function () {
         return false;
     });
 
-    // WebSocket连接
-    var ws_scheme = window.location.protocol === "https:" ? "wss" : "ws";  // 使用wss(https)或者ws(http)
-    var ws_path = ws_scheme + '://' + window.location.host + "/ws/" + currentUser + "/";
-    var webSocket = new channels.WebSocketBridge();
-    webSocket.connect(ws_path);
+    const ws_scheme = window.location.protocol === 'https' ? 'wss': 'ws';
+    const ws_path = ws_scheme + '://' + window.location.host + '/ws/' + currentUser + '/'
+    const ws = new ReconnectingWebSocket(ws_path);
 
-    window.onbeforeunload = function () {
-        // Small function to run instruction just before closing the session.
-        var payload = {
-            "type": "recieve",
-            "sender": currentUser,
-            "set_status": "offline"
-        };
-        webSocket.send(payload);
-    };
+    //监听后端发送的消息
 
-    // 监听后端发送过来的消息
-    webSocket.listen(function (event) {
-        switch (event.key) {
-            case "message":
-                if (event.sender === activeUser) {
-                    addNewMessage(event.message_id);
-                } else {
-                    $("#new-message-" + event.sender).show();
-                }
-                break;
-
-            case "set_status":
-                setUserOnlineOffline(event.sender, event.status);
-                break;
-
-            default:
-                console.log('error: ', event);
-                break;
+    ws.onmessage = function (event) {
+        console.log(event)
+        const data = JSON.parse(event.data);
+        if (data.sender === activeUser) { //当前选中的用户
+            $('.send-message').before(data.message);
+            scrollConversationScreen(); //下拉滚动条
         }
-    });
+    }
+
+
 });

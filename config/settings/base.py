@@ -69,6 +69,7 @@ DJANGO_APPS = [
     'django.forms'
 ]
 THIRD_PARTY_APPS = [
+    'channels',
     "crispy_forms",
     "allauth",
     "allauth.account",
@@ -79,6 +80,7 @@ THIRD_PARTY_APPS = [
     'taggit',
     'markdownx',
     'django_comments',
+
 ]
 
 LOCAL_APPS = [
@@ -301,3 +303,21 @@ INSTALLED_APPS += ["compressor"]
 STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+#频道层缓存
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [f'{env("REDIS_URL", default="redis://127.0.0.1:6379")}/3'],
+        },
+    },
+}
+
+ASGI_APPLICATION = 'config.routing.application'
+
+# from channels.layers import get_channel_layer
+# channel_layer = get_channel_layer()
+#
+# channel_layer.group_add(username, "channel_name")
+# channel_layer.group_add("notification", "channel_name")

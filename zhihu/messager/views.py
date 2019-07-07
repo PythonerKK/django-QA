@@ -1,10 +1,15 @@
+from asgiref.sync import async_to_sync, sync_to_async
+from channels.db import database_sync_to_async
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
+
+from channels.layers import get_channel_layer
 
 from zhihu.messager.models import Message
 from zhihu.utils.helpers import ajax_required
@@ -15,7 +20,7 @@ class MessagesListView(LoginRequiredMixin, ListView):
     所有用户的私信列表
     '''
     model = Message
-    paginate_by = 10
+    # paginate_by = 10
     template_name = 'messager/message_list.html'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -66,6 +71,14 @@ def send_message(request):
             recipient=recipient,
             message=message
         )
+        channel_layer = get_channel_layer()
+        payload = {
+            'type': 'receive',
+            'message': render_to_string('messager/single_message.html',
+                                        {'message': msg}),
+            'sender': sender.username,
+        }
+        async_to_sync(channel_layer.group_send)(recipient.username, payload)
         return render(request, 'messager/single_message.html', {
             'message': msg
         })
