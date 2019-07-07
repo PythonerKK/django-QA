@@ -13,7 +13,8 @@ urlpatterns = [
     path('comments/', include('django_comments.urls')),
 
     path('news/', include('news.urls', namespace="news")),
-    path('articles/', include('articles.urls', namespace='articles'))
+    path('articles/', include('articles.urls', namespace='articles')),
+    path('qa/', include('qa.urls', namespace='qa')),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -20,6 +20,11 @@
         <a href="{% url 'qa:ask_question' %}" class="btn btn-primary pull-right">
             <i class="fa fa-pencil" aria-hidden="true"></i> 提问
         </a>
+        {% if request.user.username == question.user.username %}
+        <a href="{% url 'qa:delete_question' question.pk %}" class="btn btn-danger pull-right">
+            <i class="fa fa-pencil" aria-hidden="true"></i> 删除
+        </a>
+        {% endif %}
         <h4>{{ question.title }}</h4>
     </div>
     <div class="row question" question-id="{{ question.id }}">

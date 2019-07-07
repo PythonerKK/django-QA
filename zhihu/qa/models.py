@@ -1,4 +1,5 @@
 import uuid
+from collections import Counter
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -51,9 +52,7 @@ class QuestionQuerySet(models.query.QuerySet):
     def get_counted_tags(self):
         '''所有标签数量'''
         tag_dict = {}
-        query = self.all().annotate(
-            tagged=models.Count('tags')).filter(tags__gt=0)
-        for obj in query:
+        for obj in self.all():
             for tag in obj.tags.names():
                 if tag not in tag_dict:
                     tag_dict[tag] = 1
@@ -98,6 +97,33 @@ class Question(CreatedUpdatedMixin, models.Model):
     def get_markdown(self):
         return markdownify(self.content)
 
+
+    def total_votes(self):
+        '''总票数'''
+        d = Counter(self.votes.values_list('value', flat=True))
+        return d[True] - d[False]
+
+
+    def get_answers(self):
+        '''获取所有的回答'''
+        return Answer.objects.filter(question=self)
+
+    def count_answers(self):
+        '''回答数'''
+        return self.get_answers().count()
+
+    def get_upvoters(self):
+        '''赞同的用户'''
+        return [vote.user for vote in self.votes.filter(value=True)]
+
+    def get_downvoters(self):
+        '''踩的用户'''
+        return [vote.user for vote in self.votes.filter(value=False)]
+
+    def get_accepted_answers(self):
+        '''获取被采纳的答案'''
+        return Answer.objects.get(question=self, is_answer=True)
+
     class Meta:
         verbose_name = '问题'
         verbose_name_plural = verbose_name
@@ -110,8 +136,7 @@ class Answer(CreatedUpdatedMixin, models.Model):
     uuid_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                              related_name='a_author')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE,
-                                 related_name='answers')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     content = MarkdownxField(verbose_name='内容')
     is_answer = models.BooleanField(default=False, verbose_name='是否被接受')
 
@@ -127,3 +152,28 @@ class Answer(CreatedUpdatedMixin, models.Model):
 
     def get_markdown(self):
         return markdownify(self.content)
+
+    def total_votes(self):
+        '''总票数'''
+        d = Counter(self.votes.values_list('value', flat=True))
+        return d[True] - d[False]
+
+    def get_upvoters(self):
+        '''赞同的用户'''
+        return [vote.user for vote in self.votes.filter(value=True)]
+
+    def get_downvoters(self):
+        '''踩的用户'''
+        return [vote.user for vote in self.votes.filter(value=False)]
+
+    def accept_answer(self):
+        '''接受回答'''
+
+        answer_set = Answer.objects.filter(question=self.question)
+        answer_set.update(is_answer=False) #把其他答案都设置为False
+
+        self.is_answer = True #设置当前为采纳答案
+        self.save()
+
+        self.question.has_answer = True  #设置问题已经有采纳的答案
+        self.question.save()
