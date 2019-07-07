@@ -214,3 +214,20 @@ class TestQAVote(BaseQATest):
         self.response_200(response)
         assert json.loads(response.content)['status'] == 'true'
 
+
+class TestDelete(BaseQATest):
+
+    def test_delete_question(self):
+        '''删除问题'''
+
+        request = RequestFactory().post('/fake')
+        request.user = self.user
+
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+
+        response = self.post(views.QuestionDeleteView, request=request,
+                             pk=self.question_one.pk)
+        self.response_302(response)
+
