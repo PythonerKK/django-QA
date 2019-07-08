@@ -65,7 +65,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.humanize", # Handy template tags,
+    #"django.contrib.humanize", # Handy template tags,
     'django.forms'
 ]
 THIRD_PARTY_APPS = [
@@ -306,7 +306,11 @@ INSTALLED_APPS += ["compressor"]
 STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
 # Your stuff...
 # ------------------------------------------------------------------------------
-
+MARKDOWN_UPLOAD_MAX_SIZE = 5 * 1024 * 1024
+MARKDOWN_IMAGE_MAX_SIZE = {
+    'size': (1000, 1000),
+    'quality': 100
+}
 #频道层缓存
 CHANNEL_LAYERS = {
     "default": {
