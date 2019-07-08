@@ -80,6 +80,7 @@ THIRD_PARTY_APPS = [
     'taggit',
     'markdownx',
     'django_comments',
+    'haystack'
 
 ]
 
@@ -89,7 +90,8 @@ LOCAL_APPS = [
     'zhihu.articles.apps.ArticlesConfig',
     'zhihu.qa.apps.QaConfig',
     'zhihu.messager.apps.MessagerConfig',
-    'zhihu.notifications.apps.NotificationsConfig'
+    'zhihu.notifications.apps.NotificationsConfig',
+    'zhihu.search.apps.SearchConfig'
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -317,8 +319,14 @@ CHANNEL_LAYERS = {
 
 ASGI_APPLICATION = 'config.routing.application'
 
-# from channels.layers import get_channel_layer
-# channel_layer = get_channel_layer()
-#
-# channel_layer.group_add(username, "channel_name")
-# channel_layer.group_add("notification", "channel_name")
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'zhihu'
+    }
+}
+
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 20
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
