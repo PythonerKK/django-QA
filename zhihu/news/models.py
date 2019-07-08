@@ -1,9 +1,12 @@
 import uuid
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.conf import settings
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+from notifications.views import notification_handler
 from utils.models import CreatedUpdatedMixin
 
 
@@ -30,6 +33,20 @@ class News(CreatedUpdatedMixin, models.Model):
     def __str__(self):
         return self.content
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        super(News, self).save(force_insert=False, force_update=False, using=None,
+             update_fields=None)
+        if not self.reply:
+            channel_layer = get_channel_layer()
+            payload = {
+                'type': 'receive',
+                'key': 'additional_news',
+                'actor_name': self.user.username,
+            }
+            async_to_sync(channel_layer.group_send)('notifications', payload)
+
 
     def switch_like(self, user):
         '''点赞或取消赞'''
@@ -39,6 +56,17 @@ class News(CreatedUpdatedMixin, models.Model):
             self.liked.remove(user)
         else:
             self.liked.add(user)
+
+            # 通知楼主
+            notification_handler(
+                actor=user,
+                recipient=self.user,
+                verb='L',
+                action_object=self,
+                key='social_update',
+                id_value=str(self.pk)
+            )
+
 
     def get_parent(self):
         """返回上级记录或者自己"""
@@ -61,6 +89,14 @@ class News(CreatedUpdatedMixin, models.Model):
             content=text,
             reply=True,
             parent=parent
+        )
+        notification_handler(
+            actor=user,
+            recipient=parent.user,
+            verb='R',
+            action_object=parent,
+            key='social_update',
+            id_value=str(parent.pk)
         )
 
     def get_thread(self):

@@ -116,3 +116,16 @@ def post_comment(request):
         })
     else:
         return HttpResponseBadRequest('请输入评论')
+
+
+@login_required
+@ajax_required
+@require_POST
+def update_interactions(request):
+    '''更新互动信息'''
+    id_value = request.POST['id_value']
+    news = News.objects.get(pk=id_value)
+    return JsonResponse({
+        'likes': news.count_likers(),
+        'comments': news.comment_count()
+    })

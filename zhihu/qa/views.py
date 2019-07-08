@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.http import require_POST
 
+from notifications.views import notification_handler
 from qa.forms import QuestionForm
 from zhihu.utils.helpers import ajax_required, AuthorRequiredMixin
 from zhihu.qa.models import Question, Answer
@@ -178,6 +179,15 @@ def accept_answer(request):
     if answer.question.user.username != request.user.username:
         raise PermissionDenied()
     answer.accept_answer()
+
+    #通知回答者
+    notification_handler(
+        actor=request.user,
+        recipient=answer.user,
+        verb='W',
+        action_object=answer
+    )
+
     return JsonResponse({
         'status': 'true'
     })

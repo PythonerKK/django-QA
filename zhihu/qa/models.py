@@ -13,6 +13,7 @@ from markdownx.utils import markdownify
 from slugify import slugify
 from taggit.managers import TaggableManager
 
+from notifications.views import notification_handler
 from utils.models import CreatedUpdatedMixin
 
 
@@ -177,3 +178,5 @@ class Answer(CreatedUpdatedMixin, models.Model):
 
         self.question.has_answer = True  #设置问题已经有采纳的答案
         self.question.save()
+
+

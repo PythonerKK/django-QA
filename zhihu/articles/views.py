@@ -4,9 +4,12 @@ from django.views.generic import CreateView, ListView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
+from django_comments.signals import comment_was_posted
+
 from articles.forms import ArticleForm
 from utils.helpers import AuthorRequiredMixin
 from zhihu.articles.models import Article
+from zhihu.notifications.views import notification_handler
 
 
 class ArticlesListView(LoginRequiredMixin, ListView):
@@ -71,3 +74,17 @@ class ArticleEditView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
     def get_success_url(self):
         messages.success(self.request, self.message)
         return reverse('articles:article', kwargs={'slug': self.get_object().slug})
+
+
+def notify_comment(**kwargs):
+    '''文章有评论通知作者'''
+    actor = kwargs['request'].user
+    obj = kwargs['comment'].content_object
+    print(obj)
+    notification_handler(
+        actor,
+        obj.user,
+        'C',
+        obj
+    )
+comment_was_posted.connect(receiver=notify_comment)

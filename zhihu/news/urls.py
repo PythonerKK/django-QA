@@ -10,4 +10,6 @@ urlpatterns = [
     path('get-thread/', view=views.get_thread, name='get_thread'),
     path('post-comment/', view=views.post_comment, name='post_comment'),
     path('delete/<str:pk>', view=views.NewsDeleteView.as_view(), name='delete_news'),
+
+    path('update-interactions/', view=views.update_interactions, name='update_interactions')
 ]

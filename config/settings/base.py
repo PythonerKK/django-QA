@@ -89,6 +89,7 @@ LOCAL_APPS = [
     'zhihu.articles.apps.ArticlesConfig',
     'zhihu.qa.apps.QaConfig',
     'zhihu.messager.apps.MessagerConfig',
+    'zhihu.notifications.apps.NotificationsConfig'
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
