@@ -1,3 +1,5 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import UpdateView, ListView, DetailView, CreateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -7,15 +9,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.http import require_POST
 
-from notifications.views import notification_handler
-from qa.forms import QuestionForm
+from zhihu.notifications.views import notification_handler
+from zhihu.qa.forms import QuestionForm
 from zhihu.utils.helpers import ajax_required, AuthorRequiredMixin
 from zhihu.qa.models import Question, Answer
 
 
 class QuestionListView(LoginRequiredMixin, ListView):
     '''所有问题列表页'''
-    model = Question
+    queryset = Question.objects.select_related('user')
     paginate_by = 10
     context_object_name = 'questions'
     template_name = 'qa/question_list.html'
@@ -26,6 +28,7 @@ class QuestionListView(LoginRequiredMixin, ListView):
         context['popular_tags'] = Question.objects.get_counted_tags()
         context['active'] = 'all'
         return context
+
 
 
 class AnsweredQuestionListView(QuestionListView):
@@ -53,7 +56,7 @@ class UnAnsweredQuestionListView(QuestionListView):
         context['active'] = 'unanswered'
         return context
 
-
+@method_decorator(cache_page(60 * 60), name='get')
 class CreateQuestionView(LoginRequiredMixin, CreateView):
     '''新建问题'''
     model = Question
@@ -76,16 +79,20 @@ class QuestionDetailView(LoginRequiredMixin, DetailView):
     template_name = 'qa/question_detail.html'
     context_object_name = 'question'
 
+    def get_queryset(self):
+        return Question.objects.select_related('user').filter(pk=self.kwargs['pk'])
+
 
 class QuestionDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
     '''问题删除'''
     model = Question
     context_object_name = 'question'
     template_name = 'qa/question_confirm_delete.html'
-
     success_url = reverse_lazy('qa:unanswered_q')
 
 
+
+@method_decorator(cache_page(60 * 60), name='get')
 class CreateAnswerView(LoginRequiredMixin, CreateView):
     '''回答问题'''
     model = Answer

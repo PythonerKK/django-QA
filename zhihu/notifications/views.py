@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.template.loader import render_to_string
 from django.views.generic import ListView, DeleteView
 
-from utils.helpers import ajax_required, AuthorRequiredMixin
+from zhihu.utils.helpers import ajax_required, AuthorRequiredMixin
 
 from zhihu.notifications.models import Notification
 

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from messager import views
+from zhihu.messager import views
 
 app_name = 'messager'
 

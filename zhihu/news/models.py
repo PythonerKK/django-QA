@@ -6,8 +6,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-from notifications.views import notification_handler
-from utils.models import CreatedUpdatedMixin
+from zhihu.notifications.views import notification_handler
+from zhihu.utils.models import CreatedUpdatedMixin
 
 
 @python_2_unicode_compatible

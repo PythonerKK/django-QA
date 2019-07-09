@@ -16,10 +16,10 @@ from zhihu.utils.models import CreatedUpdatedMixin
 class NotificationQuerySet(models.query.QuerySet):
 
     def unread(self):
-        return self.filter(unread=True)
+        return self.filter(unread=True).select_related('actor', 'recipient')
 
     def read(self):
-        return self.filter(unread=False)
+        return self.filter(unread=False).select_related('actor', 'recipient')
 
     def mark_all_as_read(self, recipient=None):
         qs = self.unread()

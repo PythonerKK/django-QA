@@ -13,11 +13,11 @@ urlpatterns = [
     path('comments/', include('django_comments.urls')),
     path('search/', include('haystack.urls')),
 
-    path('news/', include('news.urls', namespace="news")),
-    path('articles/', include('articles.urls', namespace='articles')),
-    path('qa/', include('qa.urls', namespace='qa')),
-    path('messages/', include('messager.urls', namespace='messages')),
-    path('notifications/', include('notifications.urls', namespace='notifications')),
+    path('news/', include('zhihu.news.urls', namespace="news")),
+    path('articles/', include('zhihu.articles.urls', namespace='articles')),
+    path('qa/', include('zhihu.qa.urls', namespace='qa')),
+    path('messages/', include('zhihu.messager.urls', namespace='messages')),
+    path('notifications/', include('zhihu.notifications.urls', namespace='notifications')),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

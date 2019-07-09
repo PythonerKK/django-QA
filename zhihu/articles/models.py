@@ -17,11 +17,11 @@ class ArticleQuerySet(models.query.QuerySet):
     '''
     def get_publushed(self):
         '''获取已发表的'''
-        return self.filter(status='P')
+        return self.filter(status='P').select_related('user')
 
     def get_drafts(self):
         ''''''
-        return self.filter(status='D')
+        return self.filter(status='D').select_related('user')
 
     def get_counted_tags(self):
         '''所有标签数量'''

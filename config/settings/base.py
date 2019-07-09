@@ -80,7 +80,8 @@ THIRD_PARTY_APPS = [
     'taggit',
     'markdownx',
     'django_comments',
-    'haystack'
+    'haystack',
+    'djcelery_email'
 
 ]
 
@@ -91,7 +92,8 @@ LOCAL_APPS = [
     'zhihu.qa.apps.QaConfig',
     'zhihu.messager.apps.MessagerConfig',
     'zhihu.notifications.apps.NotificationsConfig',
-    'zhihu.search.apps.SearchConfig'
+    'zhihu.search.apps.SearchConfig',
+    'zhihu.taskapp.celery.CeleryAppConfig'
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -116,7 +118,7 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 LOGIN_URL = "account_login"
-
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 # PASSWORDS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers
@@ -334,3 +336,6 @@ HAYSTACK_CONNECTIONS = {
 
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 20
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+
+

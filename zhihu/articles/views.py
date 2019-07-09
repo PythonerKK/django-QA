@@ -3,11 +3,13 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, ListView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 from django_comments.signals import comment_was_posted
 
-from articles.forms import ArticleForm
-from utils.helpers import AuthorRequiredMixin
+from zhihu.articles.forms import ArticleForm
+from zhihu.utils.helpers import AuthorRequiredMixin
 from zhihu.articles.models import Article
 from zhihu.notifications.views import notification_handler
 
@@ -37,6 +39,7 @@ class DraftListView(ArticlesListView):
         return Article.objects.filter(user=self.request.user).get_drafts()
 
 
+@method_decorator(cache_page(60 * 60), name='get')
 class ArticleCreateView(LoginRequiredMixin, CreateView):
     '''发表文章'''
     model = Article
@@ -54,10 +57,15 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
         return reverse_lazy('articles:list')
 
 
+
 class ArticleDetailView(LoginRequiredMixin, DetailView):
     '''详情'''
     model = Article
     template_name = 'articles/article_detail.html'
+
+    def get_queryset(self):
+        return Article.objects.select_related('user').filter(
+            slug=self.kwargs['slug'])
 
 
 class ArticleEditView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):

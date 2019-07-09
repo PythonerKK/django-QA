@@ -11,16 +11,16 @@ class MessageQuerySet(models.query.QuerySet):
     ''''''
     def get_conversation(self, sender, recipient):
         '''用户的私信会话'''
-        qs_one = self.filter(sender=sender, recipient=recipient)  #a给b
-        qs_two = self.filter(sender=recipient, recipient=sender)  #b给a
+        qs_one = self.filter(sender=sender, recipient=recipient).select_related('sender', 'recipient')  #a给b
+        qs_two = self.filter(sender=recipient, recipient=sender).select_related('sender', 'recipient')  #b给a
 
         return qs_one.union(qs_two).order_by('created_at')  #时间排序
 
     def get_most_recent_conversation(self, recipient):
         '''最近一次私信的用户'''
         try:
-            qs_sent = self.filter(sender=recipient) #当前用户发送的消息
-            qs_received = self.filter(recipient=recipient)#当前登录用户接受的消息
+            qs_sent = self.filter(sender=recipient).select_related('sender', 'recipient') #当前用户发送的消息
+            qs_received = self.filter(recipient=recipient).select_related('sender', 'recipient')#当前登录用户接受的消息
 
             qs = qs_sent.union(qs_received).latest('created_at')#最后一条消息
 

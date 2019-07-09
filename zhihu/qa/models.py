@@ -13,8 +13,8 @@ from markdownx.utils import markdownify
 from slugify import slugify
 from taggit.managers import TaggableManager
 
-from notifications.views import notification_handler
-from utils.models import CreatedUpdatedMixin
+from zhihu.notifications.views import notification_handler
+from zhihu.utils.models import CreatedUpdatedMixin
 
 
 @python_2_unicode_compatible
@@ -44,11 +44,11 @@ class QuestionQuerySet(models.query.QuerySet):
     '''
     def get_answered(self):
         '''已有答案的问题'''
-        return self.filter(has_answer=True)
+        return self.filter(has_answer=True).select_related('user')
 
     def get_unanswered(self):
         '''还没有答案的问题'''
-        return self.filter(has_answer=False)
+        return self.filter(has_answer=False).select_related('user')
 
     def get_counted_tags(self):
         '''所有标签数量'''
@@ -107,7 +107,7 @@ class Question(CreatedUpdatedMixin, models.Model):
 
     def get_answers(self):
         '''获取所有的回答'''
-        return Answer.objects.filter(question=self)
+        return Answer.objects.filter(question=self).select_related('user', 'question')
 
     def count_answers(self):
         '''回答数'''
@@ -115,11 +115,11 @@ class Question(CreatedUpdatedMixin, models.Model):
 
     def get_upvoters(self):
         '''赞同的用户'''
-        return [vote.user for vote in self.votes.filter(value=True)]
+        return [vote.user for vote in self.votes.filter(value=True).select_related('user').prefetch_related('votes')]
 
     def get_downvoters(self):
         '''踩的用户'''
-        return [vote.user for vote in self.votes.filter(value=False)]
+        return [vote.user for vote in self.votes.filter(value=False).select_related('user').prefetch_related('votes')]
 
     def get_accepted_answers(self):
         '''获取被采纳的答案'''
@@ -161,16 +161,16 @@ class Answer(CreatedUpdatedMixin, models.Model):
 
     def get_upvoters(self):
         '''赞同的用户'''
-        return [vote.user for vote in self.votes.filter(value=True)]
+        return [vote.user for vote in self.votes.filter(value=True).select_related('user').prefetch_related('votes')]
 
     def get_downvoters(self):
         '''踩的用户'''
-        return [vote.user for vote in self.votes.filter(value=False)]
+        return [vote.user for vote in self.votes.filter(value=False).select_related('user').prefetch_related('votes')]
 
     def accept_answer(self):
         '''接受回答'''
 
-        answer_set = Answer.objects.filter(question=self.question)
+        answer_set = Answer.objects.filter(question=self.question).select_related('user', 'question')
         answer_set.update(is_answer=False) #把其他答案都设置为False
 
         self.is_answer = True #设置当前为采纳答案
