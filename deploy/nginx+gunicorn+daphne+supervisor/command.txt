@@ -1,0 +1,3 @@
+/usr/local/python3/bin/gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.production -b 127.0.0.1:9000 --chdir /home/zhihu/zhihu config.wsgi
+/usr/local/python3/bin/daphne -p 8000 config.asgi:application
+/usr/local/python3/bin/celery --work=/home/zhihu/zhihu -A zhihu.taskapp worker -l info

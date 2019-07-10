@@ -9,6 +9,6 @@ app_path = os.path.abspath(
 )
 sys.path.append(os.path.join(app_path, "zhihu"))
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 django.setup()
 application = get_default_application()
